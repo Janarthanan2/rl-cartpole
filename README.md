@@ -1,4 +1,4 @@
-# CART POLE BALANCING
+# EX05B - CART POLE BALANCING
 
 ## AIM
 To develop and fine tune the Monte Carlo algorithm to stabilize the Cart Pole.
@@ -15,16 +15,12 @@ def create_bins(n_bins=g_bins, n_dim=4):
     np.linspace(-0.418, 0.418, n_bins),
     np.linspace(-4, 4, n_bins)
 ]
-
 return bins
 def discretize_state(observation, bins):
-
   binned_state = []
-
 for i in range(len(observation)):
     d = np.digitize(observation[i], bins[i])
     binned_state.append( d - 1)
-
 return tuple(binned_state)
 def decay_schedule(
 init_value, min_value, decay_ratio,
@@ -37,39 +33,32 @@ values = np.logspace(
 values = (values -values.min())/(values.max() - values.min())
 values = (init_value - min_value)*values +min_value
 values = np.pad(values, (0, rem_steps), 'edge')
-
 return values
-def generate_trajectory(
-select_action, Q, epsilon,
-env, max_steps=200):
-done, trajectory = False, []
-bins = create_bins(g_bins)
-
-observation,_ = env.reset()
-state = discretize_state(observation, bins)
-
-for t in count():
-    action = select_action(state, Q, epsilon)
-    observation, reward, done, _, _ = env.step(action)
-    next_state = discretize_state(observation, bins)
-    if not done:                
-        if t >= max_steps-1:
-            break
-        experience = (state, action,
-                reward, next_state, done)                            
-        trajectory.append(experience)                
-    else:
-        experience = (state, action,
-                -100, next_state, done)
-        trajectory.append(experience)                
-        #time.sleep(2)
-        break
-    state = next_state
-
-return np.array(trajectory, dtype=object)
+def generate_trajectory(select_action, Q, epsilon,env, max_steps=200):
+   done, trajectory = False, []
+   bins = create_bins(g_bins)
+   observation,_ = env.reset()
+   state = discretize_state(observation, bins)
+   for t in count():
+       action = select_action(state, Q, epsilon)
+       observation, reward, done, _, _ = env.step(action)
+       next_state = discretize_state(observation, bins)
+       if not done:                
+           if t >= max_steps-1:
+               break
+           experience = (state, action,reward, next_state, done)                            
+           trajectory.append(experience)                
+       else:
+           experience = (state, action,
+                   -100, next_state, done)
+           trajectory.append(experience)                
+           #time.sleep(2)
+           break
+       state = next_state
+   return np.array(trajectory, dtype=object)
 ```
 ## MONTE CARLO CONTROL FUNCTION
-```
+```python
 def mc_control (env,n_bins=g_bins, gamma = 1.0,
                 init_alpha = 0.5,min_alpha = 0.01, alpha_decay_ratio = 0.5,
                 init_epsilon = 1.0, min_epsilon = 0.1, epsilon_decay_ratio = 0.9,
@@ -133,8 +122,9 @@ def mc_control (env,n_bins=g_bins, gamma = 1.0,
 ```
 
 ## OUTPUT:
-<img src="" width=70%>
-<img src="" width=50%>
+<img src="https://github.com/user-attachments/assets/e2623d6e-0d90-45ca-94d6-dfca7b880f43" width=50%>
+<img src="https://github.com/user-attachments/assets/117e8e74-4f8e-4cfa-add0-4aff78c03e02" width=50%>
+<img src="https://github.com/user-attachments/assets/046d1109-11db-44a1-9658-72c07584525f" width=50%>
 
 ## RESULT:
 Thus, a Python program is developed to find the optimal policy for the given cart-pole environment using the Monte Carlo algorithm
